@@ -16,4 +16,4 @@ if __name__ == "__main__":
         registered_user = get_registered_user()
         print(registered_user)
         producer.send("registered_user", registered_user)
-        time.sleep(4)
+        time.sleep(5)
