@@ -1,10 +1,14 @@
-from kafka import KafkaProducer
+from confluent_kafka import Producer
+from avro import schema
+import avro.io
+import io
+
 from datetime import datetime
 import time
-from json import dumps
 import random
 
-# pip install kafka-python
+# pip install avro-python3
+# pip install confluent-kafka
 
 KAFKA_TOPIC_NAME_CONS = "pysaprk-topic"
 KAFKA_BOOTSTRAP_SERVERS_CONS = 'localhost:9092'
@@ -12,8 +16,8 @@ KAFKA_BOOTSTRAP_SERVERS_CONS = 'localhost:9092'
 if __name__ == "__main__":
     print("Kafka Producer Application Started ... ")
 
-    kafka_producer_obj = KafkaProducer(bootstrap_servers=KAFKA_BOOTSTRAP_SERVERS_CONS,
-                                       value_serializer=lambda x: dumps(x).encode('utf-8'))
+    kafka_config_obj = {'bootstrap.servers': KAFKA_BOOTSTRAP_SERVERS_CONS}
+    kafka_producer_obj = Producer(**kafka_config_obj)
 
     product_name_list = ["Laptop", "Desktop Computer", "Mobile Phone", "Wrist Band", "Wrist Watch", "LAN Cable",
                          "HDMI Cable", "TV", "TV Stand", "Text Books", "External Hard Drive", "Pen Drive", "Online Course"]
@@ -28,6 +32,10 @@ if __name__ == "__main__":
                                    "New Delhi,Inida", "Hyderabad,India", "Kolkata,India", "Singapore,Singapore"]
 
     ecommerce_website_name_list = ["www.datamaking.com", "www.amazon.com", "www.flipkart.com", "www.snapdeal.com", "www.ebay.com"]
+
+    # Path to user.avsc avro schema
+    avro_schema_path = "orders.avsc"
+    avro_orders_schema = schema.Parse(open(avro_schema_path).read())
 
     message_list = []
     message = None
@@ -56,9 +64,15 @@ if __name__ == "__main__":
         # print("Message Type: ", type(message))
         print("Message: ", message)
         #message_list.append(message)
-        kafka_producer_obj.send(KAFKA_TOPIC_NAME_CONS, message)
+        message_writer = avro.io.DatumWriter(avro_orders_schema)
+        message_bytes_writer = io.BytesIO()
+        message_encoder = avro.io.BinaryEncoder(message_bytes_writer)
+        message_writer.write(message, message_encoder)
+        message_raw_bytes = message_bytes_writer.getvalue()
+        kafka_producer_obj.produce(KAFKA_TOPIC_NAME_CONS, message_raw_bytes)
         time.sleep(1)
 
+    kafka_producer_obj.flush()
     # print(message_list)
 
     print("Kafka Producer Application Completed. ")

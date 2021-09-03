@@ -3,8 +3,7 @@ from datetime import datetime
 import time
 import random
 
-# pip install kafka-python
-
+KAFKA_TOPIC_NAME_CONS = "pysaprk-topic"
 KAFKA_BOOTSTRAP_SERVERS_CONS = 'localhost:9092'
 
 if __name__ == "__main__":
@@ -14,7 +13,8 @@ if __name__ == "__main__":
                                        value_serializer=lambda x: x.encode('utf-8'))
 
     product_name_list = ["Laptop", "Desktop Computer", "Mobile Phone", "Wrist Band", "Wrist Watch", "LAN Cable",
-                         "HDMI Cable", "TV", "TV Stand", "Text Books", "External Hard Drive", "Pen Drive", "Online Course"]
+                         "HDMI Cable", "TV", "TV Stand", "Text Books", "External Hard Drive", "Pen Drive",
+                         "Online Course"]
 
     order_card_type_list = ["Visa", "MasterCard", "Maestro"]
 
@@ -25,7 +25,8 @@ if __name__ == "__main__":
                                    "Chennai,India", "Bangalore,India", "Mumbai,India", "Pune,India",
                                    "New Delhi,Inida", "Hyderabad,India", "Kolkata,India", "Singapore,Singapore"]
 
-    ecommerce_website_name_list = ["www.datamaking.com", "www.amazon.com", "www.flipkart.com", "www.snapdeal.com", "www.ebay.com"]
+    ecommerce_website_name_list = ["www.datamaking.com", "www.amazon.com", "www.flipkart.com", "www.snapdeal.com",
+                                   "www.ebay.com"]
 
     message_list = []
     message = None
@@ -54,7 +55,7 @@ if __name__ == "__main__":
         message = ",".join(message_fields_value_list)
         print("Message Type: ", type(message))
         print("Message: ", message)
-        #message_list.append(message)
+        # message_list.append(message)
         kafka_producer_obj.send(KAFKA_TOPIC_NAME_CONS, message)
         time.sleep(1)
 
